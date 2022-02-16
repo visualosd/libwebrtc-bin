@@ -1,0 +1,14 @@
+CCACHE_VERSION=4.3
+WEBRTC_VERSION=m94.4606{\#4}
+WEBRTC_SEMANTIC_VERSION=94.4606.4.1
+WEBRTC_COMMIT=6584528aeb0f0e2ab4d14114aefeee7e5997ade9
+
+PACKAGE_NAMES= \
+  ios-x64 \
+  ios-arm64
+
+DOCKER_PACKAGE_NAMES= \
+  linux-arm \
+  linux-arm64 \
+  linux-x64 \
+  android

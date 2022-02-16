@@ -1,0 +1,46 @@
+name: build
+
+on: workflow_dispatch
+
+jobs:
+  build-ios:
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - ios-arm64
+          - ios-x64
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: make -C build USE_CCACHE=0 ${{ matrix.name }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: libwebrtc-${{ matrix.name }}.tar.xz
+          path: package/libwebrtc-${{ matrix.name }}.tar.xz
+
+  release:
+    name: Release
+    needs:
+      - build-ios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download libwebrtc-ios-arm64.tar.xz
+        uses: actions/download-artifact@v2
+        with:
+          name: libwebrtc-ios-arm64.tar.xz
+      - name: Download libwebrtc-ios-x64.tar.xz
+        uses: actions/download-artifact@v2
+        with:
+          name: libwebrtc-ios-x64.tar.xz
+      - name: Publish artifact
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "stable"
+          prerelease: false
+          files: |
+            libwebrtc-ios-arm64.tar.xz
+            libwebrtc-ios-x64.tar.xz
