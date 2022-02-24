@@ -10,6 +10,8 @@ jobs:
         name:
           - ios-arm64
           - ios-x64
+          # - ios-catalyst-arm64
+          # - ios-catalyst-x64
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
@@ -25,22 +27,88 @@ jobs:
     name: Release
     needs:
       - build-ios
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     steps:
-      - name: Download libwebrtc-ios-arm64.tar.xz
-        uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v2
         with:
           name: libwebrtc-ios-arm64.tar.xz
-      - name: Download libwebrtc-ios-x64.tar.xz
-        uses: actions/download-artifact@v2
+
+      - uses: actions/download-artifact@v2
         with:
           name: libwebrtc-ios-x64.tar.xz
+
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: libwebrtc-ios-catalyst-arm64.tar.xz
+
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: libwebrtc-ios-catalyst-x64.tar.xz
+
+      # - name: Unpack
+      #   run: |
+      #     mkdir -p libwebrtc-ios-arm64
+      #     tar -Jxvf libwebrtc-ios-arm64.tar.xz -C libwebrtc-ios-arm64
+      #     mkdir -p libwebrtc-ios-x64
+      #     tar -Jxvf libwebrtc-ios-x64.tar.xz -C libwebrtc-ios-x64
+      #     mkdir -p libwebrtc-ios-catalyst-arm64
+      #     tar -Jxvf libwebrtc-ios-catalyst-arm64.tar.xz -C libwebrtc-ios-catalyst-arm64
+      #     mkdir -p libwebrtc-ios-catalyst-x64
+      #     tar -Jxvf libwebrtc-ios-catalyst-x64.tar.xz -C libwebrtc-ios-catalyst-x64
+
+      - name: Unpack
+        run: |
+          mkdir -p libwebrtc-ios-arm64
+          tar -Jxvf libwebrtc-ios-arm64.tar.xz -C libwebrtc-ios-arm64
+          mkdir -p libwebrtc-ios-x64
+          tar -Jxvf libwebrtc-ios-x64.tar.xz -C libwebrtc-ios-x64
+
+      - name: Merge library ios
+        run: |
+          cp -r libwebrtc-ios-arm64 libwebrtc-ios
+          lipo -create libwebrtc-ios-arm64/lib/libwebrtc.a \
+            libwebrtc-ios-x64/lib/libwebrtc.a \
+            -output libwebrtc-ios/lib/libwebrtc.a
+          lipo -create libwebrtc-ios-arm64/lib/libboringssl.a \
+            libwebrtc-ios-x64/lib/libboringssl.a \
+            -output libwebrtc-ios/lib/libboringssl.a
+          cd libwebrtc-ios
+          tar -Jcvf libwebrtc-ios.tar.xz include lib NOTICE VERSION
+          cd ..
+
+      # - name: Merge library ios catalyst
+      #   run: |
+      #     cp -r libwebrtc-ios-catalyst-arm64 libwebrtc-ios-catalyst
+      #     lipo -create libwebrtc-ios-catalyst-arm64/lib/libwebrtc.a \
+      #       libwebrtc-ios-catalyst-x64/lib/libwebrtc.a \
+      #       -output libwebrtc-ios-catalyst/lib/libwebrtc.a
+      #     lipo -create libwebrtc-ios-catalyst-arm64/lib/libboringssl.a \
+      #       libwebrtc-ios-catalyst-x64/lib/libboringssl.a \
+      #       -output libwebrtc-ios-catalyst/lib/libboringssl.a
+      #     cd libwebrtc-ios-catalyst
+      #     tar -Jcvf libwebrtc-ios-catalyst.tar.xz include lib NOTICE VERSION
+      #     cd ..
+
+      # - name: Publish artifact
+      #   uses: "marvinpinto/action-automatic-releases@latest"
+      #   with:
+      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
+      #     automatic_release_tag: "build${{ github.run_number }}"
+      #     prerelease: false
+      #     files: |
+      #       libwebrtc-ios-arm64.tar.xz
+      #       libwebrtc-ios-x64.tar.xz
+      #       libwebrtc-ios-catalyst-arm64.tar.xz
+      #       libwebrtc-ios-catalyst-x64.tar.xz
+      #       libwebrtc-ios/libwebrtc-ios.tar.xz
+      #       libwebrtc-ios-catalyst/libwebrtc-ios-catalyst.tar.xz
       - name: Publish artifact
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "stable"
+          automatic_release_tag: "build${{ github.run_number }}"
           prerelease: false
           files: |
             libwebrtc-ios-arm64.tar.xz
             libwebrtc-ios-x64.tar.xz
+            libwebrtc-ios/libwebrtc-ios.tar.xz
