@@ -50,7 +50,8 @@ common-patch:
 	&& patch -p1 < $(PATCH_DIR)/nacl_armv6_2.patch \
 	&& patch -p2 < $(PATCH_DIR)/4k.patch \
 	&& patch -p2 < $(PATCH_DIR)/macos_h264_encoder.patch \
-	&& patch -p2 < $(PATCH_DIR)/fix_python_used_by_gn.patch
+	&& patch -p2 < $(PATCH_DIR)/fix_python_used_by_gn.patch \
+	&& patch -p1 < $(PATCH_DIR)/openssl_lib.patch
 
 .PHONY: common-package
 common-package: copy
@@ -67,9 +68,9 @@ common-copy: generate-licenses
 	mkdir -p $(PACKAGE_DIR)/lib
 	mkdir -p $(PACKAGE_DIR)/include
 	cp $(BUILD_DIR)/obj/libwebrtc.a $(PACKAGE_DIR)/lib/libwebrtc.a
-	cp $(BUILD_DIR)/obj/third_party/boringssl/libboringssl.a $(PACKAGE_DIR)/lib/libboringssl.a
 
 	rsync -amv '--include=*/' '--include=*.h' '--include=*.hpp' '--exclude=*' $(SRC_DIR)/. $(PACKAGE_DIR)/include/.
+	cp -r $(HOME)/Desktop/openssl-ios-dist/include/openssl $(PACKAGE_DIR)/include/openssl
 
 	cp -f $(BUILD_DIR)/LICENSE.md $(PACKAGE_DIR)/NOTICE
 	echo '$(WEBRTC_VERSION)' > $(PACKAGE_DIR)/VERSION

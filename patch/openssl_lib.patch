@@ -1,0 +1,47 @@
+diff --git a/DEPS b/DEPS
+index ccf0017575..ca75db27f6 100644
+--- a/DEPS
++++ b/DEPS
+@@ -123,8 +123,6 @@ deps = {
+       'dep_type': 'cipd',
+   },
+ 
+-  'src/third_party/boringssl/src':
+-    'https://boringssl.googlesource.com/boringssl.git@519c2986c73c23461b130ad19b93fd7d081353d5',
+   'src/third_party/breakpad/breakpad':
+     'https://chromium.googlesource.com/breakpad/breakpad.git@bc7ddae23425cee8999e4e8ed61f77a62f058cbf',
+   'src/third_party/catapult':
+diff --git a/rtc_base/BUILD.gn b/rtc_base/BUILD.gn
+index 809bb4aadf..09fe037fc2 100644
+--- a/rtc_base/BUILD.gn
++++ b/rtc_base/BUILD.gn
+@@ -25,6 +25,11 @@ if (!rtc_build_ssl) {
+     assert(rtc_ssl_root != "",
+            "You must specify rtc_ssl_root when rtc_build_ssl==0.")
+     include_dirs = [ rtc_ssl_root ]
++    lib_dirs = [ "${rtc_ssl_root}/../lib" ]
++    libs = [
++      "ssl",
++      "crypto",
++    ]
+   }
+ }
+ 
+diff --git a/tools_webrtc/libs/generate_licenses.py b/tools_webrtc/libs/generate_licenses.py
+index cbb1514d3c..c53bade549 100755
+--- a/tools_webrtc/libs/generate_licenses.py
++++ b/tools_webrtc/libs/generate_licenses.py
+@@ -45,13 +45,11 @@ LIB_TO_LICENSES_DICT = {
+         'com_google_auto_service_auto_service/LICENSE'
+     ],
+     'bazel': ['third_party/bazel/LICENSE'],
+-    'boringssl': ['third_party/boringssl/src/LICENSE'],
+     'crc32c': ['third_party/crc32c/src/LICENSE'],
+     'errorprone': [
+         'third_party/android_deps/libs/'
+         'com_google_errorprone_error_prone_core/LICENSE'
+     ],
+-    'fiat': ['third_party/boringssl/src/third_party/fiat/LICENSE'],
+     'guava': ['third_party/android_deps/libs/com_google_guava_guava/LICENSE'],
+     'ijar': ['third_party/ijar/LICENSE'],
+     'jsoncpp': ['third_party/jsoncpp/LICENSE'],

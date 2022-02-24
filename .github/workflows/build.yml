@@ -15,6 +15,13 @@ jobs:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
+      - name: Build openssl
+        run: |
+          cd ${{ github.workspace }}/build-openssl-ios
+          chmod +x ./build.sh
+          chmod +x ./build_openssl_dist.sh
+          ./build.sh
+          ls ${HOME}/Desktop/openssl-ios-dist/
       - name: Build
         run: make -C build USE_CCACHE=0 ${{ matrix.name }}
       - name: Upload artifact
@@ -69,9 +76,6 @@ jobs:
           lipo -create libwebrtc-ios-arm64/lib/libwebrtc.a \
             libwebrtc-ios-x64/lib/libwebrtc.a \
             -output libwebrtc-ios/lib/libwebrtc.a
-          lipo -create libwebrtc-ios-arm64/lib/libboringssl.a \
-            libwebrtc-ios-x64/lib/libboringssl.a \
-            -output libwebrtc-ios/lib/libboringssl.a
           cd libwebrtc-ios
           tar -Jcvf libwebrtc-ios.tar.xz include lib NOTICE VERSION
           cd ..
@@ -82,9 +86,6 @@ jobs:
       #     lipo -create libwebrtc-ios-catalyst-arm64/lib/libwebrtc.a \
       #       libwebrtc-ios-catalyst-x64/lib/libwebrtc.a \
       #       -output libwebrtc-ios-catalyst/lib/libwebrtc.a
-      #     lipo -create libwebrtc-ios-catalyst-arm64/lib/libboringssl.a \
-      #       libwebrtc-ios-catalyst-x64/lib/libboringssl.a \
-      #       -output libwebrtc-ios-catalyst/lib/libboringssl.a
       #     cd libwebrtc-ios-catalyst
       #     tar -Jcvf libwebrtc-ios-catalyst.tar.xz include lib NOTICE VERSION
       #     cd ..
