@@ -1,5 +1,5 @@
 diff --git a/DEPS b/DEPS
-index ccf0017575..ca75db27f6 100644
+index 54510ae75c..40be216a06 100644
 --- a/DEPS
 +++ b/DEPS
 @@ -123,8 +123,6 @@ deps = {
@@ -12,7 +12,7 @@ index ccf0017575..ca75db27f6 100644
      'https://chromium.googlesource.com/breakpad/breakpad.git@bc7ddae23425cee8999e4e8ed61f77a62f058cbf',
    'src/third_party/catapult':
 diff --git a/rtc_base/BUILD.gn b/rtc_base/BUILD.gn
-index 809bb4aadf..09fe037fc2 100644
+index 40c4835456..905253f43b 100644
 --- a/rtc_base/BUILD.gn
 +++ b/rtc_base/BUILD.gn
 @@ -25,6 +25,11 @@ if (!rtc_build_ssl) {
@@ -45,3 +45,66 @@ index cbb1514d3c..c53bade549 100755
      'guava': ['third_party/android_deps/libs/com_google_guava_guava/LICENSE'],
      'ijar': ['third_party/ijar/LICENSE'],
      'jsoncpp': ['third_party/jsoncpp/LICENSE'],
+diff --git a/third_party/libsrtp/BUILD.gn b/third_party/libsrtp/BUILD.gn
+index 0f0f9e5..e31ef43 100644
+--- a/third_party/libsrtp/BUILD.gn
++++ b/third_party/libsrtp/BUILD.gn
+@@ -55,6 +55,13 @@ config("libsrtp_config") {
+     "include",
+     "crypto/include",
+   ]
++  home_dir = getenv("HOME")
++  include_dirs += [ "${home_dir}/Desktop/openssl-ios-dist/include" ]
++  lib_dirs = [ "${home_dir}/Desktop/openssl-ios-dist/lib" ]
++  libs = [
++      "ssl",
++      "crypto",
++  ]
+ }
+ 
+ config("libsrtp_warnings") {
+@@ -132,10 +139,6 @@ static_library("libsrtp") {
+     # "crypto/cipher/aes_gcm_nss.c",
+     # "crypto/cipher/aes_icm_nss.c",
+   ]
+-
+-  public_deps = [
+-    "//third_party/boringssl:boringssl",
+-  ]
+ }
+ 
+ if (build_libsrtp_tests) {
+diff --git a/third_party/usrsctp/BUILD.gn b/third_party/usrsctp/BUILD.gn
+index 906194eec0a..a965c3c85df 100644
+--- a/third_party/usrsctp/BUILD.gn
++++ b/third_party/usrsctp/BUILD.gn
+@@ -16,6 +16,13 @@ config("usrsctp_public_config") {
+   if (is_mac || is_ios || target_os == "freebsd") {
+     defines = [ "HAVE_SCONN_LEN" ]
+   }
++  home_dir = getenv("HOME")
++  include_dirs += [ "${home_dir}/Desktop/openssl-ios-dist/include" ]
++  lib_dirs = [ "${home_dir}/Desktop/openssl-ios-dist/lib" ]
++  libs = [
++      "ssl",
++      "crypto",
++  ]
+ }
+ 
+ # Used by both usrsctp static library and fuzzers.
+@@ -116,7 +123,6 @@ static_library("usrsctp") {
+     "SCTP_PROCESS_LEVEL_LOCKS",
+     "SCTP_SIMPLE_ALLOCATOR",
+     "SCTP_USE_OPENSSL_SHA1",
+-    "SCTP_USE_OPENSSL_RAND",
+     "__Userspace__",
+ 
+     # "SCTP_DEBUG", # Uncomment for SCTP debugging.
+@@ -143,7 +149,6 @@ static_library("usrsctp") {
+   if (use_fuzzing_engine) {
+     defines += [ "INVARIANTS" ]
+   }
+-  deps = [ "//third_party/boringssl" ]
+ }
+ 
+ fuzzer_test("usrsctp_fuzzer_listen") {
